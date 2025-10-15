@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+  nginx-proxy:
+    image: nginxproxy/nginx-proxy:alpine
+    container_name: nginx-proxy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./certs:/etc/nginx/certs:ro
+      - ./vhost.d:/etc/nginx/vhost.d
+      - ./html:/usr/share/nginx/html
+    networks:
+      - webnet
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: acme-companion
+    restart: always
+    environment:
+      - DEFAULT_EMAIL=admin@hideinbasement.online
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./certs:/etc/nginx/certs
+    networks:
+      - webnet
+
+  fastapi:
+    build: .
+    container_name: fastapi_server
+    restart: always
+    environment:
+      - VIRTUAL_HOST=app.hideinbasement.online
+      - LETSENCRYPT_HOST=app.hideinbasement.online
+      - LETSENCRYPT_EMAIL=admin@hideinbasement.online
+    expose:
+      - "8000"
+    networks:
+      - webnet
+    volumes:
+      - ./:/app
+
+networks:
+  webnet:
+    driver: bridge

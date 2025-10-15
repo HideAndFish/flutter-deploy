@@ -1,0 +1,14 @@
+[
+	{
+		"id": "msg1",
+		"type": "text",
+		"author": {
+			"id": "user1",
+			"firstName": "Петренко",
+			"lastName": "Світлана",
+			"imageUrl": "https://picsum.photos/250?image=9"
+		},
+		"createdAt": 1728699000000,
+		"text": "Привіт! Давно не бачились, можете пройти на процедуру"
+	}
+]
